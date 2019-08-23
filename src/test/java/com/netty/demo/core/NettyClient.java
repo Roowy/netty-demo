@@ -10,6 +10,7 @@ import com.netty.demo.server.protocol.serialize.SerializerAlgorithm;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -56,7 +57,7 @@ public class NettyClient {
      */
     private static void startConsoleThread(Channel channel) {
         LoginRequestPacket loginRequestPacket = LoginRequestPacket.of("admin", "123456");
-        channel.writeAndFlush(PacketEncode.encode(channel.alloc(), loginRequestPacket, SerializerAlgorithm.JSON));
+        //channel.writeAndFlush(PacketEncode.encode(channel.alloc(), loginRequestPacket, SerializerAlgorithm.JSON));
         new Thread(() -> {
             while (!Thread.interrupted()) {
 //                if (channel.attr(ProtocolConstant.LOGIN).get() != null && Objects.equals(Boolean.TRUE, channel.attr(ProtocolConstant.LOGIN).get())) {
@@ -66,7 +67,15 @@ public class NettyClient {
                 MessageRequestPacket packet = new MessageRequestPacket();
                 packet.setMessage(line);
                 ByteBuf byteBuf = PacketEncode.encode(channel.alloc(), packet, SerializerAlgorithm.JSON);
-                channel.writeAndFlush(byteBuf);
+                ChannelFuture channelFuture = channel.writeAndFlush(byteBuf);
+                channelFuture.addListener(future -> {
+                    if (future.isSuccess()) {
+                        System.out.println("###########发送成功");
+                    } else {
+                        System.out.println("##############发送失败！");
+                    }
+                });
+
 //                }
             }
         }).start();
