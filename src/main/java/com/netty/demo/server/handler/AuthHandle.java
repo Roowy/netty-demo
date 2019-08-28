@@ -1,6 +1,7 @@
 package com.netty.demo.server.handler;
 
 import com.netty.demo.server.protocol.ProtocolConstant;
+import com.netty.demo.server.util.SessionUtil;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -20,13 +21,13 @@ import java.util.Objects;
 public class AuthHandle extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        if (Objects.equals(Boolean.TRUE, ctx.channel().attr(ProtocolConstant.LOGIN).get())) {
+        if (!SessionUtil.hasLogin(ctx.channel())) {
+            log.error("无登录验证，强制关闭连接");
+            ctx.channel().close();
+        } else {
             // 已登录，移除处理器
             ctx.pipeline().remove(this);
             super.channelRead(ctx, msg);
-        } else {
-            log.error("无登录验证，强制关闭连接");
-            ctx.channel().close();
         }
     }
 }

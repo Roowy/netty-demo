@@ -5,21 +5,19 @@ import lombok.Data;
 
 /**
  * @author wangyi
- * @description:
+ * @description: 消息接收响应包
  * @date 2019/8/20 19:52
  */
 @Data
 public class MessageResponsePacket extends Packet {
+    private String fromUserId;
+
+    private String fromUserName;
+
     private String message;
 
     @Override
     public Byte getCommand() {
         return Command.MESSAGE_RESPONSE;
-    }
-
-    public static MessageResponsePacket of(String message) {
-        MessageResponsePacket packet = new MessageResponsePacket();
-        packet.setMessage(message);
-        return packet;
     }
 }

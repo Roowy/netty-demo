@@ -12,9 +12,7 @@ import java.util.UUID;
  */
 @Data
 public class LoginRequestPacket extends Packet {
-    private String userId;
-
-    private String username;
+    private String userName;
 
     private String password;
 
@@ -23,15 +21,4 @@ public class LoginRequestPacket extends Packet {
         return Command.LOGIN_REQUEST;
     }
 
-    public static LoginRequestPacket of(String username, String password) {
-        return of(UUID.randomUUID().toString(), username, password);
-    }
-
-    public static LoginRequestPacket of(String userId, String username, String password) {
-        LoginRequestPacket requestPacket = new LoginRequestPacket();
-        requestPacket.setPassword(password);
-        requestPacket.setUserId(userId);
-        requestPacket.setUsername(username);
-        return requestPacket;
-    }
 }

@@ -1,5 +1,6 @@
 package com.netty.demo.server.protocol;
 
+import com.netty.demo.server.session.Session;
 import io.netty.util.AttributeKey;
 
 /**
@@ -28,7 +29,7 @@ public interface ProtocolConstant {
     int MIN_PROTOCOL_LEN = 15;
 
     /**
-     * 登录属性
+     * 用户会话属性
      */
-    AttributeKey<Boolean> LOGIN = AttributeKey.newInstance("login");
+    AttributeKey<Session> SESSION = AttributeKey.newInstance("session");
 }

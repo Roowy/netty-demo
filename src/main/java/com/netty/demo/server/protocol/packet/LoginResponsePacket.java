@@ -12,7 +12,17 @@ import lombok.Data;
 public class LoginResponsePacket extends Packet {
 
     /**
-     * 是否成功
+     * 用户id
+     */
+    private String userId;
+
+    /**
+     * 用户昵称
+     */
+    private String userName;
+
+    /**
+     * 是否登录成功
      */
     private boolean success;
 
@@ -26,10 +36,4 @@ public class LoginResponsePacket extends Packet {
         return Command.LOGIN_RESPONSE;
     }
 
-    public static LoginResponsePacket of(boolean success, String reason) {
-        LoginResponsePacket packet = new LoginResponsePacket();
-        packet.setReason(reason);
-        packet.setSuccess(success);
-        return packet;
-    }
 }

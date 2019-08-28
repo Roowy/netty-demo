@@ -2,6 +2,8 @@ package com.netty.demo.core;
 
 import com.netty.demo.server.protocol.ProtocolConstant;
 import com.netty.demo.server.protocol.packet.LoginResponsePacket;
+import com.netty.demo.server.session.Session;
+import com.netty.demo.server.util.SessionUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
@@ -14,25 +16,21 @@ import java.util.concurrent.TimeUnit;
  * @date 2019/8/21 15:42
  */
 public class LoginResponsePacketHandle extends SimpleChannelInboundHandler<LoginResponsePacket> {
-
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, LoginResponsePacket loginResponsePacket) {
+        String userId = loginResponsePacket.getUserId();
+        String userName = loginResponsePacket.getUserName();
 
-    }
-
-    @Override
-    protected void channelRead0(ChannelHandlerContext ctx, LoginResponsePacket packet) throws Exception {
-        if (packet.isSuccess()) {
-            System.out.println(new Date() + "客户端登录成功");
-            ctx.channel().attr(ProtocolConstant.LOGIN).set(true);
+        if (loginResponsePacket.isSuccess()) {
+            System.out.println("[" + userName + "]登录成功，userId 为: " + loginResponsePacket.getUserId());
+            SessionUtil.bindSession(new Session(userId, userName), ctx.channel());
         } else {
-            System.out.println(new Date() + "客户端登录失败：" + packet);
-            ctx.channel().attr(ProtocolConstant.LOGIN).set(false);
+            System.out.println("[" + userName + "]登录失败，原因：" + loginResponsePacket.getReason());
         }
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("客户端连接被关闭");
+    public void channelInactive(ChannelHandlerContext ctx) {
+        System.out.println("客户端连接被关闭!");
     }
 }

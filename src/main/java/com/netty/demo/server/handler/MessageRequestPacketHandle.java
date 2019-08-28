@@ -2,6 +2,9 @@ package com.netty.demo.server.handler;
 
 import com.netty.demo.server.protocol.packet.MessageRequestPacket;
 import com.netty.demo.server.protocol.packet.MessageResponsePacket;
+import com.netty.demo.server.session.Session;
+import com.netty.demo.server.util.SessionUtil;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -19,18 +22,34 @@ import org.springframework.stereotype.Component;
 public class MessageRequestPacketHandle extends SimpleChannelInboundHandler<MessageRequestPacket> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, MessageRequestPacket msg) throws Exception {
-        ctx.channel().writeAndFlush(doMessage(ctx, msg));
+        doMessage(ctx, msg);
     }
 
     /**
-     * 处理消息
+     * 发送消息
      *
      * @param ctx
-     * @param packet
+     * @param messageRequestPacket
      * @return
      */
-    private MessageResponsePacket doMessage(ChannelHandlerContext ctx, MessageRequestPacket packet) {
-        log.info("服务端收到客户端发送的消息：【{}】", packet.getMessage());
-        return MessageResponsePacket.of("我是服务端，我已收到客户端发送的消息：" + packet.getMessage());
+    private void doMessage(ChannelHandlerContext ctx, MessageRequestPacket messageRequestPacket) {
+        // 1.拿到消息发送方的会话信息
+        Session session = SessionUtil.getSession(ctx.channel());
+
+        // 2.通过消息发送方的会话信息构造要发送的消息
+        MessageResponsePacket messageResponsePacket = new MessageResponsePacket();
+        messageResponsePacket.setFromUserId(session.getUserId());
+        messageResponsePacket.setFromUserName(session.getUserName());
+        messageResponsePacket.setMessage(messageRequestPacket.getMessage());
+
+        // 3.拿到消息接收方的 channel
+        Channel toUserChannel = SessionUtil.getChannel(messageRequestPacket.getToUserId());
+
+        // 4.将消息发送给消息接收方
+        if (toUserChannel != null && SessionUtil.hasLogin(toUserChannel)) {
+            toUserChannel.writeAndFlush(messageResponsePacket);
+        } else {
+            log.error("{}不在线，发送失败!", messageRequestPacket.getToUserId());
+        }
     }
 }

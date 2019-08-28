@@ -3,6 +3,8 @@ package com.netty.demo.server.handler;
 import com.netty.demo.server.protocol.ProtocolConstant;
 import com.netty.demo.server.protocol.packet.LoginRequestPacket;
 import com.netty.demo.server.protocol.packet.LoginResponsePacket;
+import com.netty.demo.server.session.Session;
+import com.netty.demo.server.util.SessionUtil;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -10,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @author wangyi
@@ -25,14 +28,46 @@ public class LoginRequestPacketHandle extends SimpleChannelInboundHandler<LoginR
         ctx.channel().writeAndFlush(doLogin(ctx, msg));
     }
 
+    /**
+     * 连接关闭，解绑session
+     *
+     * @param ctx
+     * @throws Exception
+     */
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        SessionUtil.unBindSession(ctx.channel());
+    }
+
     private LoginResponsePacket doLogin(ChannelHandlerContext ctx, LoginRequestPacket requestPacket) {
-        log.info("客户端发送登录信息：【{}】", requestPacket);
-        boolean loginResult = Objects.equals("admin", requestPacket.getUsername()) && Objects.equals("123456", requestPacket.getPassword());
-        if (loginResult) {
-            ctx.channel().attr(ProtocolConstant.LOGIN).set(true);
-            return LoginResponsePacket.of(true, "登录成功！");
+        LoginResponsePacket responsePacket = new LoginResponsePacket();
+        responsePacket.setVersion(requestPacket.getVersion());
+        responsePacket.setUserName(requestPacket.getUserName());
+        if (valid(requestPacket)) {
+            responsePacket.setSuccess(true);
+            String userId = randomUserId();
+            responsePacket.setUserId(userId);
+            log.info("[{}]登录成功", requestPacket.getUserName());
+            SessionUtil.bindSession(new Session(userId, requestPacket.getUserName()), ctx.channel());
         } else {
-            return LoginResponsePacket.of(false, "登录失败，账号或密码错误！");
+            responsePacket.setReason("账号密码校验失败");
+            responsePacket.setSuccess(false);
+            log.info("[{}]登录失败", requestPacket.getUserName());
         }
+        return responsePacket;
+    }
+
+
+    /**
+     * 随机生成用户id
+     *
+     * @return
+     */
+    private String randomUserId() {
+        return UUID.randomUUID().toString().split("-")[0];
+    }
+
+    private boolean valid(LoginRequestPacket requestPacket) {
+        return true;
     }
 }

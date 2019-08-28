@@ -23,9 +23,6 @@ public class TestCoder {
         LoginRequestPacket loginRequestPacket = new LoginRequestPacket();
 
         loginRequestPacket.setVersion(((byte) 1));
-        loginRequestPacket.setUserId("123");
-        loginRequestPacket.setUsername("zhangsan");
-        loginRequestPacket.setPassword("password");
 
         PacketEncode packetCodeC = new PacketEncode();
         ByteBuf byteBuf = packetCodeC.encode(loginRequestPacket);

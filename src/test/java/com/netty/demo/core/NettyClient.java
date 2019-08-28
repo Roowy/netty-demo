@@ -7,6 +7,7 @@ import com.netty.demo.server.protocol.coder.PacketEncode;
 import com.netty.demo.server.protocol.packet.LoginRequestPacket;
 import com.netty.demo.server.protocol.packet.MessageRequestPacket;
 import com.netty.demo.server.protocol.serialize.SerializerAlgorithm;
+import com.netty.demo.server.util.SessionUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -56,28 +57,35 @@ public class NettyClient {
      * @param channel
      */
     private static void startConsoleThread(Channel channel) {
-        LoginRequestPacket loginRequestPacket = LoginRequestPacket.of("admin", "123456");
-        //channel.writeAndFlush(PacketEncode.encode(channel.alloc(), loginRequestPacket, SerializerAlgorithm.JSON));
+        Scanner sc = new Scanner(System.in);
+        LoginRequestPacket loginRequestPacket = new LoginRequestPacket();
+
         new Thread(() -> {
             while (!Thread.interrupted()) {
-//                if (channel.attr(ProtocolConstant.LOGIN).get() != null && Objects.equals(Boolean.TRUE, channel.attr(ProtocolConstant.LOGIN).get())) {
-                System.out.println("输入消息发送至服务端: ");
-                Scanner sc = new Scanner(System.in);
-                String line = sc.nextLine();
-                MessageRequestPacket packet = new MessageRequestPacket();
-                packet.setMessage(line);
-                ByteBuf byteBuf = PacketEncode.encode(channel.alloc(), packet, SerializerAlgorithm.JSON);
-                ChannelFuture channelFuture = channel.writeAndFlush(byteBuf);
-                channelFuture.addListener(future -> {
-                    if (future.isSuccess()) {
-                        System.out.println("###########发送成功");
-                    } else {
-                        System.out.println("##############发送失败！");
-                    }
-                });
+                if (!SessionUtil.hasLogin(channel)) {
+                    System.out.print("输入用户名登录: ");
+                    String username = sc.nextLine();
+                    loginRequestPacket.setUserName(username);
 
-//                }
+                    // 密码使用默认的
+                    loginRequestPacket.setPassword("pwd");
+
+                    // 发送登录数据包
+                    channel.writeAndFlush(loginRequestPacket);
+                    waitForLoginResponse();
+                } else {
+                    String toUserId = sc.next();
+                    String message = sc.next();
+                    channel.writeAndFlush(new MessageRequestPacket(toUserId, message));
+                }
             }
         }).start();
+    }
+
+    private static void waitForLoginResponse() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ignored) {
+        }
     }
 }
