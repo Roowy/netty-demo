@@ -1,5 +1,7 @@
 package com.netty.demo.core;
 
+import com.netty.demo.console.ConsoleCommandManager;
+import com.netty.demo.console.LoginConsoleCommand;
 import com.netty.demo.server.handler.PacketDecodeHandle;
 import com.netty.demo.server.handler.PacketEncodeHandle;
 import com.netty.demo.server.protocol.ProtocolConstant;
@@ -45,6 +47,8 @@ public class NettyClient {
                         ch.pipeline().addLast(new PacketEncodeHandle());
                         ch.pipeline().addLast(new LoginResponsePacketHandle());
                         ch.pipeline().addLast(new MessageResponsePacketHandle());
+                        ch.pipeline().addLast(new CreateGroupResponseHandle());
+                        ch.pipeline().addLast(new LogoutResponseHandler());
                     }
                 });
         Channel channel = bootstrap.connect("127.0.0.1", 8000).channel();
@@ -57,26 +61,15 @@ public class NettyClient {
      * @param channel
      */
     private static void startConsoleThread(Channel channel) {
-        Scanner sc = new Scanner(System.in);
-        LoginRequestPacket loginRequestPacket = new LoginRequestPacket();
+        ConsoleCommandManager consoleCommandManager = new ConsoleCommandManager();
+        LoginConsoleCommand loginConsoleCommand = new LoginConsoleCommand();
 
         new Thread(() -> {
             while (!Thread.interrupted()) {
                 if (!SessionUtil.hasLogin(channel)) {
-                    System.out.print("输入用户名登录: ");
-                    String username = sc.nextLine();
-                    loginRequestPacket.setUserName(username);
-
-                    // 密码使用默认的
-                    loginRequestPacket.setPassword("pwd");
-
-                    // 发送登录数据包
-                    channel.writeAndFlush(loginRequestPacket);
-                    waitForLoginResponse();
+                    loginConsoleCommand.exec(channel);
                 } else {
-                    String toUserId = sc.next();
-                    String message = sc.next();
-                    channel.writeAndFlush(new MessageRequestPacket(toUserId, message));
+                    consoleCommandManager.exec(channel);
                 }
             }
         }).start();

@@ -23,6 +23,10 @@ public class PacketFactory {
         packetClassMap.put(Command.LOGIN_RESPONSE, LoginResponsePacket.class);
         packetClassMap.put(Command.MESSAGE_REQUEST, MessageRequestPacket.class);
         packetClassMap.put(Command.MESSAGE_RESPONSE, MessageResponsePacket.class);
+        packetClassMap.put(Command.LOGOUT_REQUEST, LogoutRequestPacket.class);
+        packetClassMap.put(Command.LOGOUT_RESPONSE, LogoutResponsePacket.class);
+        packetClassMap.put(Command.CREATE_GROUP_REQUEST, CreateGroupRequestPacket.class);
+        packetClassMap.put(Command.CREATE_GROUP_RESPONSE, CreateGroupResponsePacket.class);
     }
 
     /**

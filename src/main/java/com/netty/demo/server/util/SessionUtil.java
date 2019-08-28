@@ -19,9 +19,9 @@ public class SessionUtil {
 
     static {
         new Thread(() -> {
-            while (true){
+            while (true) {
                 if (Objects.nonNull(userIdChannelMap)) {
-                    System.out.println("###########################" + userIdChannelMap.size() + "###########################");
+//                    System.out.println("###########################" + userIdChannelMap.size() + "###########################");
                 }
                 try {
                     TimeUnit.SECONDS.sleep(1);
@@ -46,7 +46,7 @@ public class SessionUtil {
 
     public static boolean hasLogin(Channel channel) {
 
-        return channel.hasAttr(ProtocolConstant.SESSION);
+        return channel.hasAttr(ProtocolConstant.SESSION) && Objects.nonNull(channel.attr(ProtocolConstant.SESSION).get());
     }
 
     public static Session getSession(Channel channel) {

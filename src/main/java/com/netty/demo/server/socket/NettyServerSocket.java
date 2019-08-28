@@ -32,6 +32,10 @@ public class NettyServerSocket {
     private MessageRequestPacketHandle messageRequestPacketHandle;
     @Autowired
     private AuthHandle authHandle;
+    @Autowired
+    private CreateGroupRequestHandler createGroupRequestHandler;
+    @Autowired
+    private LogoutRequestHandler logoutRequestHandler;
 
     @PostConstruct
     public void start() {
@@ -52,6 +56,8 @@ public class NettyServerSocket {
                         ch.pipeline().addLast(loginRequestPacketHandle);
                         ch.pipeline().addLast(authHandle);
                         ch.pipeline().addLast(messageRequestPacketHandle);
+                        ch.pipeline().addLast(createGroupRequestHandler);
+                        ch.pipeline().addLast(logoutRequestHandler);
                     }
                 })
                 //表示系统用于临时存放已完成三次握手的请求的队列的最大长度，如果连接建立频繁，服务器处理创建新连接较慢，可以适当调大这个参数
