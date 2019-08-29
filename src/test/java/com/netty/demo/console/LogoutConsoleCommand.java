@@ -15,6 +15,5 @@ public class LogoutConsoleCommand implements ConsoleCommand {
     public void exec(Channel channel) {
         LogoutRequestPacket logoutRequestPacket = new LogoutRequestPacket();
         channel.writeAndFlush(logoutRequestPacket);
-        waitForLoginResponse();
     }
 }

@@ -45,4 +45,44 @@ public interface Command {
      * 创建群聊响应
      */
     Byte CREATE_GROUP_RESPONSE = 8;
+
+    /**
+     * 获取群用户请求
+     */
+    Byte LIST_GROUP_MEMBERS_REQUEST = 9;
+
+    /**
+     * 获取群用户响应
+     */
+    Byte LIST_GROUP_MEMBERS_RESPONSE = 10;
+
+    /**
+     * 加群请求
+     */
+    Byte JOIN_GROUP_REQUEST = 11;
+
+    /**
+     * 加群响应
+     */
+    Byte JOIN_GROUP_RESPONSE = 12;
+
+    /**
+     * 退群请求
+     */
+    Byte QUIT_GROUP_REQUEST = 13;
+
+    /**
+     * 退群响应
+     */
+    Byte QUIT_GROUP_RESPONSE = 14;
+
+    /**
+     * 群消息请求
+     */
+    Byte GROUP_MESSAGE_REQUEST = 15;
+
+    /**
+     * 群消息响应
+     */
+    Byte GROUP_MESSAGE_RESPONSE = 16;
 }

@@ -49,6 +49,10 @@ public class NettyClient {
                         ch.pipeline().addLast(new MessageResponsePacketHandle());
                         ch.pipeline().addLast(new CreateGroupResponseHandle());
                         ch.pipeline().addLast(new LogoutResponseHandler());
+                        ch.pipeline().addLast(new JoinGroupResponseHandler());
+                        ch.pipeline().addLast(new QuitGroupResponseHandler());
+                        ch.pipeline().addLast(new ListGroupMembersResponseHandler());
+                        ch.pipeline().addLast(new GroupMessageResponseHandler());
                     }
                 });
         Channel channel = bootstrap.connect("127.0.0.1", 8000).channel();
@@ -71,6 +75,7 @@ public class NettyClient {
                 } else {
                     consoleCommandManager.exec(channel);
                 }
+                waitForLoginResponse();
             }
         }).start();
     }

@@ -19,10 +19,18 @@ public class ConsoleCommandManager implements ConsoleCommand {
         consoleCommandMap.put("sendToUser", new SendToUserConsoleCommand());
         consoleCommandMap.put("logout", new LogoutConsoleCommand());
         consoleCommandMap.put("createGroup", new CreateGroupConsoleCommand());
+        consoleCommandMap.put("joinGroup", new JoinGroupConsoleCommand());
+        consoleCommandMap.put("quitGroup", new QuitGroupConsoleCommand());
+        consoleCommandMap.put("listGroupMembers", new ListGroupMembersConsoleCommand());
+        consoleCommandMap.put("sendToGroup", new SendToGroupConsoleCommand());
         commandList = new ArrayList<>();
         commandList.add("sendToUser");
         commandList.add("logout");
         commandList.add("createGroup");
+        commandList.add("joinGroup");
+        commandList.add("quitGroup");
+        commandList.add("listGroupMembers");
+        commandList.add("sendToGroup");
     }
 
     @Override
@@ -39,9 +47,10 @@ public class ConsoleCommandManager implements ConsoleCommand {
         ConsoleCommand consoleCommand = consoleCommandMap.get(command);
 
         if (consoleCommand != null) {
-            consoleCommand.exec( channel);
+            consoleCommand.exec(channel);
         } else {
             System.err.println("无法识别[" + command + "]指令，请重新输入!");
         }
+        waitForLoginResponse();
     }
 }

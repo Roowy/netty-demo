@@ -27,6 +27,14 @@ public class PacketFactory {
         packetClassMap.put(Command.LOGOUT_RESPONSE, LogoutResponsePacket.class);
         packetClassMap.put(Command.CREATE_GROUP_REQUEST, CreateGroupRequestPacket.class);
         packetClassMap.put(Command.CREATE_GROUP_RESPONSE, CreateGroupResponsePacket.class);
+        packetClassMap.put(Command.JOIN_GROUP_REQUEST, JoinGroupRequestPacket.class);
+        packetClassMap.put(Command.JOIN_GROUP_RESPONSE, JoinGroupResponsePacket.class);
+        packetClassMap.put(Command.LIST_GROUP_MEMBERS_REQUEST, ListGroupMembersRequestPacket.class);
+        packetClassMap.put(Command.LIST_GROUP_MEMBERS_RESPONSE, ListGroupMembersResponsePacket.class);
+        packetClassMap.put(Command.QUIT_GROUP_REQUEST, QuitGroupRequestPacket.class);
+        packetClassMap.put(Command.QUIT_GROUP_RESPONSE, QuitGroupResponsePacket.class);
+        packetClassMap.put(Command.GROUP_MESSAGE_REQUEST, GroupMessageRequestPacket.class);
+        packetClassMap.put(Command.GROUP_MESSAGE_RESPONSE, GroupMessageResponsePacket.class);
     }
 
     /**
